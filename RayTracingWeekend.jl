@@ -117,7 +117,6 @@ end
     See [diagram](https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal/mirroredlightreflection)
 """
 reflect(v::SVector{3,Float32}, n⃗::SVector{3,Float32}) = v - (2v⋅n⃗)*n⃗
-reflect(@SVector[0.6f0,-0.8f0,0f0], @SVector[0f0,1f0,0f0]) # diagram's example
 
 """Create a scattered ray emitted by `mat` from incident Ray `r`. 
 
