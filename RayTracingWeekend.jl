@@ -65,12 +65,6 @@ abstract type Hittable end
 """Materials tell us how rays interact with a surface"""
 abstract type Material end
 
-begin
-    struct NoMaterial <: Material end
-    
-    const _no_material = NoMaterial()
-    const _y_up = @SVector[0f0,1f0,0f0]
-end
 
 "Record a hit between a ray and an object's surface"
 mutable struct HitRecord
