@@ -95,7 +95,7 @@ end
 function ray_to_HitRecord(t, p, outward_n⃗, r_dir::SVector{3,Float32}, mat::Material)
     front_face = r_dir ⋅ outward_n⃗ < 0
     n⃗ = front_face ? outward_n⃗ : -outward_n⃗
-    rec = HitRecord(t,p,n⃗,front_face,mat)
+    HitRecord(t,p,n⃗,front_face,mat)
 end
 
 struct Scatter
@@ -163,15 +163,13 @@ function hit(s::Sphere, r::Ray, tmin::Float32, tmax::Float32)
     return ray_to_HitRecord(t, p, n⃗, r.dir, s.mat)
 end
 
-struct HittableList <: Hittable
-    list::Vector{Hittable}
-end
+const HittableList = Vector{Hittable}
 
 """Find closest hit between `Ray r` and a list of Hittable objects `h`, within distance `tmin` < `tmax`"""
 function hit(hittables::HittableList, r::Ray, tmin::Float32, tmax::Float32)
     closest = tmax # closest t so far
     rec = _no_hit
-    for h in hittables.list
+    for h in hittables
         temprec = hit(h, r, tmin, closest)
         if temprec !== _no_hit
             rec = temprec
@@ -352,7 +350,7 @@ end
 
 
 # Random spheres
-function scene_random_spheres()::HittableList # dielectric spheres
+function scene_random_spheres() # dielectric spheres
     spheres = Sphere[]
 
     # ground 
