@@ -271,7 +271,7 @@ function scatter(mat::Dielectric, r_in::Ray, rec::HitRecord)
     cosθ = min(-r_in.dir⋅rec.n⃗, 1.0f0)
     sinθ = √(1.0f0 - cosθ^2)
     cannot_refract = refraction_ratio * sinθ > 1.0
-    if cannot_refract || reflectance(cosθ, refraction_ratio) > rand()
+    if cannot_refract || reflectance(cosθ, refraction_ratio) > rand(Float32)
         dir = reflect(r_in.dir, rec.n⃗)
     else
         dir = refract(r_in.dir, rec.n⃗, refraction_ratio)
@@ -340,8 +340,8 @@ function render(scene::HittableList, cam::Camera, image_width=400,
             if s != 1 # 1st sample is always centered, for 1-sample/pixel
                 # claforte: I think the C++ version had a bug, the rand offset was
                 # between [0,1] instead of centered at 0, e.g. [-0.5, 0.5].
-                u += convert(Float32, (rand()-0.5f0) / image_width)
-                v += convert(Float32 ,(rand()-0.5f0) / image_height)
+                u += (rand(Float32) - 0.5f0) / image_width
+                v += (rand(Float32) - 0.5f0) / image_height
             end
             ray = get_ray(cam, u, v)
             accum_color += ray_color(ray, scene)
@@ -361,15 +361,15 @@ function scene_random_spheres()::HittableList # dielectric spheres
                           Lambertian(@SVector[0.5f0,0.5f0,0.5f0])))
 
     for a in -11:10, b in -11:10
-        choose_mat = rand()
-        center = @SVector[a + 0.9f0*rand(), 0.2f0, b + 0.90f0*rand()]
+        choose_mat = rand(Float32)
+        center = @SVector[a + 0.9f0*rand(Float32), 0.2f0, b + 0.90f0*rand(Float32)]
 
         # skip spheres too close?
         if norm(center - @SVector[4f0,0.2f0,0f0]) < 0.9f0 continue end 
             
         if choose_mat < 0.8f0
             # diffuse
-            albedo = @SVector[rand() for i ∈ 1:3] .* @SVector[rand() for i ∈ 1:3]
+            albedo = @SVector[rand(Float32) for i ∈ 1:3] .* @SVector[rand(Float32) for i ∈ 1:3]
             push!(spheres, Sphere(center, 0.2f0, Lambertian(albedo)))
         elseif choose_mat < 0.95f0
             # metal
@@ -404,5 +404,5 @@ scene = scene_random_spheres()
 render(scene, t_cam1, 200, 43)
 #=
 @btime render(scene, t_cam1, 200, 43);
-  10.153 s (2490648 allocations: 114.27 MiB)
+  10.222 s (2399087 allocations: 110.08 MiB)
 =#
